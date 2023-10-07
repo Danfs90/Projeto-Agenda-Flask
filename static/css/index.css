@@ -18,6 +18,22 @@ html, body {
   padding: 0 10px;
 }
 
+@import "~bootstrap/scss/bootstrap.scss";
+a{
+    color: rgb(95, 94, 94);
+     text-decoration:none;
+}
+
+@import "~bootstrap/scss/bootstrap.scss";
+.modal.fade .modal-dialog {
+  -webkit-transition: -webkit-transform 0.3s ease-out;
+     -moz-transition: -moz-transform 0.3s ease-out;
+       -o-transition: -o-transform 0.3s ease-out;
+          transition: transform 0.3s ease-out;
+}
+
+
+
 
 
 :root {
@@ -52,14 +68,3 @@ html, body {
 }
 
 
-.modal-content-sm {
-  width: 300px;
-  margin: 0 auto;
-}
-
-.close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  cursor: pointer;
-}
