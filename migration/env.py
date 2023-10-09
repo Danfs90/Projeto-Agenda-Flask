@@ -1,3 +1,11 @@
+import sys
+import os
+
+# Adicione o caminho para o diretório raiz do projeto ao caminho do Python
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+
+
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
@@ -20,8 +28,8 @@ if config.config_file_name is not None:
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 
-from projeto_agenda import models
-target_metadata = models.Base.metadata
+from projeto_agenda import settings
+target_metadata = settings.Base.metadata
 
 
 # other values from the config, defined by the needs of env.py,

@@ -115,3 +115,58 @@
   </div>
  </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="modal-content">
+  <div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Novo Evento</h5>
+  </div>
+  <div class="modal-body">
+    <form>
+      <div class="mb-3">
+        <label for="recipient-name" class="col-form-label">Procedimento:</label>
+        <input type="text" class="form-control" id="recipient-name">
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="mb-3">
+            <label for="recipient-phone" class="col-form-label">Numero de telefone:</label>
+            <input type="tel"  class="form-control" id="recipient-phone" name="telefone" pattern="\([0-9]{2}\) [0-9]{4}-[0-9]{4}" placeholder="(00) 1234-5678">
+
+          </div>
+        </div>
+        <div class="col">
+          <div class="mb-3">
+            <label for="recipient-cpf" class="col-form-label">CPF:</label>
+            <input type="text" id="cpf" class="form-control" name="cpf" pattern="[0-9]{3}\.[0-9]{3}\.[0-9]{3}-[0-9]{2}" placeholder="123.456.789-00">
+          </div>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label for="recipient-birthdate" class="col-form-label">Data de nascimento:</label>
+        <input type="date" class="form-control" id="recipient-birthdate">
+      </div>
+      <div class="mb-3">
+        <label for="message-text" class="col-form-label">Message:</label>
+        <textarea class="form-control" id="message-text"></textarea>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" id="closeModal">Fechar</button>
+    <button type="button" class="btn btn-primary">Salvar evento</button>
+  </div>
+</div>

@@ -18,14 +18,49 @@
 
   <link  href="/static/css/index.css" rel="stylesheet">
 
+</head>
 
+<body>
+  <div id='calendar'></div>
+  <div class="modal" id="eventModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Novo Evento</h5>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label for="recipient-name" class="col-form-label">Procedimento(s)</label>
+              <select class="form-select" id="recipient-name" onchange="fetchAvailableHours()" multiple>
+                <!-- As opções dos procedimentos serão preenchidas aqui -->
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="recipient-hours" class="col-form-label">Horarios disponiveis</label>
+              <select class="form-select" id="recipient-hours">
+                <!-- Os horários disponíveis serão preenchidos aqui -->
+              </select>      
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="closeModal">Fechar</button>
+          <button type="button" class="btn btn-primary">Salvar evento</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
   <script>
     const eventModalId = 'eventModal';
     const closeModalButtonId = 'closeModal';
+    let calendar;
 
     document.addEventListener('DOMContentLoaded', function() {
       const calendarEl = document.getElementById('calendar');
-      const calendar = new FullCalendar.Calendar(calendarEl, {
+      calendar = new FullCalendar.Calendar(calendarEl, {
         headerToolbar: {
           left: 'prev,next today',
           center: 'title',
@@ -42,11 +77,15 @@
 
         // Abrir modal quando seleciona o dia
         select: function(start, end, allDay) {
+          console.log(start)
           openModal();
         }
       });
       calendar.setOption('themeSystem', 'bootstrap5');
       calendar.render();
+
+      // Chame a função para buscar e preencher os procedimentos
+      fetchProcedures();
     });
 
     // FUNÇÕES PARA O MODAL
@@ -55,20 +94,21 @@
       modal.classList.add('modal-fade');
       modal.style.display = 'block';
 
-
-
       // Adicione um evento de clique no botão de fechar do modal
       const closeModalButton = document.getElementById(closeModalButtonId);
       closeModalButton.addEventListener('click', function() {
         closeModal();
       });
     }
-
+    
+    //Função para fechar a modal 
     function closeModal() {
       const modal = document.getElementById(eventModalId);
       modal.style.display = 'none';
     }
 
+    //Função para realizar o fade na modal
+    //TODO essa parada nao esta funcionando por causa do bootstrap 
     const modal = document.getElementById(eventModalId);
     modal.addEventListener('transitionend', function() {
       if (modal.classList.contains('modal-fade')) {
@@ -76,57 +116,60 @@
       }
     });
 
+    // Função para buscar e preencher os procedimentos
+    function fetchProcedures() {
+      fetch('/procedures') 
+        .then(response => response.json())
+        .then(data => {
+          const selectElement = document.getElementById('recipient-name');
+          selectElement.innerHTML = '';
+
+          data.forEach(procedure => {
+            const option = document.createElement('option');
+            option.value = procedure.id;
+            option.textContent = procedure.name_procedures;
+            selectElement.appendChild(option);
+          });
+        })
+        .catch(error => {
+          console.error('Erro ao buscar procedimentos:', error);
+        });
+    }
+
+    // Função para buscar horários disponíveis ao selecionar um procedimento
+    function fetchAvailableHours() {
+      const selectProcedureElement = document.getElementById('recipient-name');
+      const selectedProcedureIds = Array.from(selectProcedureElement.selectedOptions).map(option => option.value);
+
+
+      // Obtenha a data selecionada do FullCalendar
+      const selectedDate = calendar.getDate().toISOString();
+
+      // Get da api events
+      fetch(`/events/${selectedDate}/${selectedProcedureIds.join(',')}`)
+        .then(response => response.json())
+        .then(data => {
+          // Manipule os horários disponíveis retornados pela API, preenchendo o select de horários
+          const selectHoursElement = document.getElementById('recipient-hours');
+          selectHoursElement.innerHTML = '';
+
+          data.horarios_disponiveis.forEach(hour => {
+            const option = document.createElement('option');
+            option.value = hour;
+            option.textContent = hour;
+            selectHoursElement.appendChild(option);
+          });
+        })
+        .catch(error => {
+          console.error('Erro ao buscar horários disponíveis:', error);
+        });
+    }
+
+    // Adicione um evento 'change' ao select de procedimento para chamar a função fetchAvailableHours
+    const selectProcedureElement = document.getElementById('recipient-name');
+    selectProcedureElement.addEventListener('change', function() {
+      fetchAvailableHours();
+    });
   </script>
-</head>
-
-
-<body>
-  <div id='calendar'></div>
 </body>
-<div class="modal" id="eventModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Novo Evento</h5>
-      </div>
-      <div class="modal-body">
-        <form>
-          <div class="mb-3">
-            <label for="recipient-name" class="col-form-label">Nome Cliente:</label>
-            <input type="text" class="form-control" id="recipient-name">
-          </div>
-          <div class="row">
-            <div class="col">
-              <div class="mb-3">
-                <label for="recipient-phone" class="col-form-label">Numero de telefone:</label>
-                <input type="tel"  class="form-control" id="recipient-phone" name="telefone" pattern="\([0-9]{2}\) [0-9]{4}-[0-9]{4}" placeholder="(00) 1234-5678">
-
-              </div>
-            </div>
-            <div class="col">
-              <div class="mb-3">
-                <label for="recipient-cpf" class="col-form-label">CPF:</label>
-                <input type="text" id="cpf" class="form-control" name="cpf" pattern="[0-9]{3}\.[0-9]{3}\.[0-9]{3}-[0-9]{2}" placeholder="123.456.789-00">
-              </div>
-            </div>
-          </div>
-          <div class="mb-3">
-            <label for="recipient-birthdate" class="col-form-label">Data de nascimento:</label>
-            <input type="date" class="form-control" id="recipient-birthdate">
-          </div>
-          <div class="mb-3">
-            <label for="message-text" class="col-form-label">Message:</label>
-            <textarea class="form-control" id="message-text"></textarea>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" id="closeModal">Fechar</button>
-        <button type="button" class="btn btn-primary">Salvar evento</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-</div>
 </html>
